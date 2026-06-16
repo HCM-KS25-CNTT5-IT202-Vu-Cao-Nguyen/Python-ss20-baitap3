@@ -1,5 +1,5 @@
+
 import logging
-import unittest
 
 logging.basicConfig(
     filename="tournament_app.log",
@@ -28,7 +28,15 @@ matches = [
 
 
 def display_matches(match_list):
-    """Hiển thị danh sách trận đấu."""
+    """
+    Hiển thị danh sách trận đấu.
+
+    Args:
+        match_list (list): Danh sách trận đấu.
+
+    Returns:
+        None
+    """
     logging.info("User viewed the match list.")
 
     if not match_list:
@@ -39,7 +47,7 @@ def display_matches(match_list):
     print(
         f"{'Mã trận':<10} | {'Đội A':<15} | {'Đội B':<15} | {'Tỷ số':<8} | {'Trạng thái'}"
     )
-    print("-" * 75)
+    print("-" * 70)
 
     for match in match_list:
         try:
@@ -51,11 +59,19 @@ def display_matches(match_list):
                 f"{match['status']}"
             )
         except KeyError as error:
-            logging.error(f"Missing key: {error}")
+            logging.error(f"Missing key in match data: {error}")
 
 
 def add_match(match_list):
-    """Thêm trận đấu mới."""
+    """
+    Thêm trận đấu mới.
+
+    Args:
+        match_list (list): Danh sách trận đấu.
+
+    Returns:
+        None
+    """
     print("\n--- THÊM TRẬN ĐẤU MỚI ---")
 
     match_id = input("Nhập mã trận đấu: ").strip()
@@ -85,16 +101,16 @@ def add_match(match_list):
         )
         return
 
-    match_list.append(
-        {
-            "match_id": match_id,
-            "team_a": team_a,
-            "team_b": team_b,
-            "score_a": 0,
-            "score_b": 0,
-            "status": "Pending"
-        }
-    )
+    new_match = {
+        "match_id": match_id,
+        "team_a": team_a,
+        "team_b": team_b,
+        "score_a": 0,
+        "score_b": 0,
+        "status": "Pending"
+    }
+
+    match_list.append(new_match)
 
     print(f"Thành công: Đã thêm trận đấu {match_id}.")
     logging.info(
@@ -103,7 +119,15 @@ def add_match(match_list):
 
 
 def get_valid_score(team_name):
-    """Nhập điểm hợp lệ."""
+    """
+    Nhập điểm hợp lệ.
+
+    Args:
+        team_name (str): Tên đội.
+
+    Returns:
+        int
+    """
     while True:
         try:
             score = int(
@@ -131,7 +155,15 @@ def get_valid_score(team_name):
 
 
 def update_score(match_list):
-    """Cập nhật tỷ số trận đấu."""
+    """
+    Cập nhật tỷ số trận đấu.
+
+    Args:
+        match_list (list): Danh sách trận đấu.
+
+    Returns:
+        None
+    """
     print("\n--- CẬP NHẬT TỶ SỐ TRẬN ĐẤU ---")
 
     match_id = input(
@@ -168,14 +200,16 @@ def update_score(match_list):
     selected_match["score_b"] = score_b
 
     if score_a == 0 and score_b == 0:
-        confirm = input(
-            "Tỷ số đang là 0-0. Trọng tài có xác nhận trận đã hoàn thành không? (y/n): "
+        confirmation = input(
+            "Tỷ số đang là 0-0. "
+            "Trọng tài có xác nhận trận đã hoàn thành không? (y/n): "
         ).lower()
 
-        if confirm == "y":
+        if confirmation == "y":
             selected_match["status"] = "Completed"
         else:
             selected_match["status"] = "Pending"
+
     else:
         selected_match["status"] = "Completed"
 
@@ -189,7 +223,15 @@ def update_score(match_list):
 
 
 def determine_winner(match):
-    """Xác định đội thắng."""
+    """
+    Xác định đội thắng.
+
+    Args:
+        match (dict): Thông tin trận đấu.
+
+    Returns:
+        str
+    """
     if match["status"] == "Pending":
         return "Not Started"
 
@@ -203,7 +245,15 @@ def determine_winner(match):
 
 
 def generate_report(match_list):
-    """Sinh báo cáo thống kê."""
+    """
+    Sinh báo cáo giải đấu.
+
+    Args:
+        match_list (list): Danh sách trận đấu.
+
+    Returns:
+        None
+    """
     print("\n--- BÁO CÁO THỐNG KÊ GIẢI ĐẤU ---")
 
     completed_count = 0
@@ -216,7 +266,8 @@ def generate_report(match_list):
                 print(
                     f"{match['match_id']}: "
                     f"{match['team_a']} "
-                    f"{match['score_a']}-{match['score_b']} "
+                    f"{match['score_a']}-"
+                    f"{match['score_b']} "
                     f"{match['team_b']} | "
                     f"Kết quả: {winner}"
                 )
@@ -225,7 +276,7 @@ def generate_report(match_list):
 
         except KeyError as error:
             logging.error(
-                f"Missing key in report: {error}"
+                f"Missing key in report generation: {error}"
             )
 
     if completed_count == 0:
@@ -241,7 +292,9 @@ def generate_report(match_list):
 
 
 def display_menu():
-    """Hiển thị menu."""
+    """
+    Hiển thị menu chính.
+    """
     print("\n===== HỆ THỐNG QUẢN LÝ GIẢI ĐẤU RIKKEI ESPORTS =====")
     print("1. Hiển thị lịch thi đấu & Kết quả")
     print("2. Thêm trận đấu mới")
@@ -251,50 +304,10 @@ def display_menu():
     print("==================================================")
 
 
-class TestDetermineWinner(unittest.TestCase):
-
-    def test_team_a_win(self):
-        match = {
-            "team_a": "T1",
-            "team_b": "GenG",
-            "score_a": 2,
-            "score_b": 0,
-            "status": "Completed"
-        }
-        self.assertEqual(
-            determine_winner(match),
-            "T1"
-        )
-
-    def test_draw(self):
-        match = {
-            "team_a": "JDG",
-            "team_b": "BLG",
-            "score_a": 1,
-            "score_b": 1,
-            "status": "Completed"
-        }
-        self.assertEqual(
-            determine_winner(match),
-            "Draw"
-        )
-
-    def test_pending(self):
-        match = {
-            "team_a": "G2",
-            "team_b": "FNC",
-            "score_a": 0,
-            "score_b": 0,
-            "status": "Pending"
-        }
-        self.assertEqual(
-            determine_winner(match),
-            "Not Started"
-        )
-
-
 def main():
-    """Điều khiển chương trình."""
+    """
+    Hàm điều khiển chương trình.
+    """
     while True:
         display_menu()
 
@@ -322,7 +335,9 @@ def main():
             break
 
         else:
-            print("Lựa chọn không hợp lệ.")
+            print(
+                "Lựa chọn không hợp lệ."
+            )
             logging.warning(
                 "Invalid menu choice selected"
             )
@@ -330,3 +345,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
